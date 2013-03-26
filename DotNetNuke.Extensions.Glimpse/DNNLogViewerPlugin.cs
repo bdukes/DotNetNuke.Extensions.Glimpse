@@ -13,7 +13,7 @@ namespace DotNetNuke.Extensions.Glimpse
     {
         public override string Name
         {
-            get { return "DotNetNuke Log Viewer"; }
+            get { return "DNN Log"; }
         }
 
         /// <summary>

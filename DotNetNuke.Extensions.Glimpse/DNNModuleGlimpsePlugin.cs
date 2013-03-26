@@ -16,7 +16,7 @@ namespace DotNetNuke.Extensions.Glimpse
     {
         public override string Name
         {
-            get { return "DotNetNuke Modules"; }
+            get { return "DNN Modules"; }
         }
 
         /// <summary>
