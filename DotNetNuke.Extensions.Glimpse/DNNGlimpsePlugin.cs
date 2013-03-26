@@ -4,17 +4,16 @@ using System.Linq;
 using System.Web;
 using DotNetNuke.Entities.Portals;
 using DotNetNuke.Entities.Users;
+using DotNetNuke.Services.Exceptions;
+using Glimpse.AspNet.Extensibility;
 using Glimpse.Core.Extensibility;
 
 namespace DotNetNuke.Extensions.Glimpse
 {
-    /// <summary>
-    /// DotNetNuke Glimpse Plugin.
-    /// </summary>
-    [GlimpsePlugin]
-    public class DNNGlimpsePlugin : IGlimpsePlugin
+    /// <summary>DotNetNuke Glimpse Plugin</summary>
+    public class DNNGlimpsePlugin : AspNetTab
     {
-        public string Name
+        public override string Name
         {
             get { return "DotNetNuke"; }
         }
@@ -24,56 +23,50 @@ namespace DotNetNuke.Extensions.Glimpse
         /// </summary>
         /// <param name="context">The context.</param>
         /// <returns>Data to send the the Glimpse client.</returns>
-        public object GetData(HttpContextBase context)
+        public override object GetData(ITabContext context)
         {
             try
             {
-                // get variables we'll need to output
                 var portalSettings = PortalSettings.Current;
                 var tabCreatedByUser = UserController.GetUserById(-1, portalSettings.ActiveTab.CreatedByUserID);
                 var tabModifiedByUser = UserController.GetUserById(-1, portalSettings.ActiveTab.LastModifiedByUserID);
-                var portalAliases = new PortalAliasController().GetPortalAliasArrayByPortalID(portalSettings.PortalId)
-                    .Cast<PortalAliasInfo>()
-                    .Select(p => p.HTTPAlias);
-                var contextItems = new List<object[]> { new object[] { "Key", "Value" } };
-                foreach (var itemKey in context.Items.Keys)                
-                    contextItems.Add(new object[] { itemKey.ToString(), context.Items[itemKey].ToString() });                
-                
-                // add to data to send
-                var data = new List<object[]> { new object[] { "Property", "Value" } };
-                data.Add(new object[] { "PortalID", portalSettings.PortalId });
-                data.Add(new object[] { "Portal Name", portalSettings.PortalName });
-                data.Add(new object[] { "Portal Aliases", portalAliases.ToArray() });
-                data.Add(new object[] { "Portal SSL Enabled", portalSettings.SSLEnabled });
-                data.Add(new object[] { "Portal SSL Enforced", portalSettings.SSLEnforced });
-                data.Add(new object[] { "User ID", portalSettings.UserId });
-                data.Add(new object[] { "User Name", portalSettings.UserInfo.Username });
-                data.Add(new object[] { "User Roles", portalSettings.UserInfo.Roles });
-                data.Add(new object[] { "Tab ID", portalSettings.ActiveTab.TabID });
-                data.Add(new object[] { "Tab Name", portalSettings.ActiveTab.TabName });
-                data.Add(new object[] { "Tab Title", portalSettings.ActiveTab.Title });
-                data.Add(new object[] { "Tab Path", portalSettings.ActiveTab.TabPath });
-                data.Add(new object[] { "Tab SSL Enabled", portalSettings.ActiveTab.IsSecure });
-                data.Add(new object[] { "Tab Created By", (tabCreatedByUser == null) ? null : tabCreatedByUser.Username });
-                data.Add(new object[] { "Tab Created Date", portalSettings.ActiveTab.CreatedOnDate });
-                data.Add(new object[] { "Tab Modified By", (tabModifiedByUser == null) ? null : tabModifiedByUser.Username });
-                data.Add(new object[] { "Tab Modified Date", portalSettings.ActiveTab.LastModifiedOnDate });
-                data.Add(new object[] { "Tab Skin Path", portalSettings.ActiveTab.SkinPath });
-                data.Add(new object[] { "Tab Skin Source", portalSettings.ActiveTab.SkinSrc });
-                data.Add(new object[] { "Context Items", contextItems });                                
+                var portalAliases = from PortalAliasInfo pa in new PortalAliasController().GetPortalAliasArrayByPortalID(portalSettings.PortalId)
+                                    select pa.HTTPAlias;
 
-                return data;
+                var httpContext = context.GetRequestContext<HttpContextBase>();
+                var contextItems = (from string key in httpContext.Items.Keys 
+                                    select new[] { key, httpContext.Items[key] }).ToList();
+
+                return new List<object[]>
+                           {
+                               new object[] { "Property", "Value" },
+                               new object[] { "Portal ID", portalSettings.PortalId },
+                               new object[] { "Portal Name", portalSettings.PortalName },
+                               new object[] { "Portal Aliases", portalAliases.ToArray() },
+                               new object[] { "Portal SSL Enabled", portalSettings.SSLEnabled },
+                               new object[] { "Portal SSL Enforced", portalSettings.SSLEnforced },
+                               new object[] { "User ID", portalSettings.UserId },
+                               new object[] { "User Name", portalSettings.UserInfo.Username },
+                               new object[] { "User Roles", portalSettings.UserInfo.Roles },
+                               new object[] { "Tab ID", portalSettings.ActiveTab.TabID },
+                               new object[] { "Tab Name", portalSettings.ActiveTab.TabName },
+                               new object[] { "Tab Title", portalSettings.ActiveTab.Title },
+                               new object[] { "Tab Path", portalSettings.ActiveTab.TabPath },
+                               new object[] { "Tab SSL Enabled", portalSettings.ActiveTab.IsSecure },
+                               new object[] { "Tab Created By", (tabCreatedByUser == null) ? null : tabCreatedByUser.Username },
+                               new object[] { "Tab Created Date", portalSettings.ActiveTab.CreatedOnDate },
+                               new object[] { "Tab Modified By", (tabModifiedByUser == null) ? null : tabModifiedByUser.Username },
+                               new object[] { "Tab Modified Date", portalSettings.ActiveTab.LastModifiedOnDate },
+                               new object[] { "Tab Skin Path", portalSettings.ActiveTab.SkinPath },
+                               new object[] { "Tab Skin Source", portalSettings.ActiveTab.SkinSrc },
+                               new object[] { "Context Items", contextItems },
+                           };
             }
             catch (Exception ex)
             {
-                DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
-                return null;
+                Exceptions.LogException(ex);
+                return ex.Message + ex.StackTrace;
             }
-        }        
-
-        public void SetupInit()
-        {
-            // nothing to do here right now
         }
     }
 }

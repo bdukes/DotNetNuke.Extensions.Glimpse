@@ -1,19 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Web;
 using DotNetNuke.Entities.Portals;
+using DotNetNuke.Services.Exceptions;
 using DotNetNuke.Services.Log.EventLog;
+using Glimpse.AspNet.Extensibility;
 using Glimpse.Core.Extensibility;
 
 namespace DotNetNuke.Extensions.Glimpse
 {
-    /// <summary>
-    /// DotNetNuke Glimpse Plugin for DNN Log Viewer.
-    /// </summary>
-    [GlimpsePlugin]
-    public class DNNLogViewerPlugin : IGlimpsePlugin
+    /// <summary>DotNetNuke Glimpse Plugin for DNN Log Viewer</summary>
+    public class DNNLogViewerPlugin : AspNetTab
     {
-        public string Name
+        public override string Name
         {
             get { return "DotNetNuke Log Viewer"; }
         }
@@ -23,7 +21,7 @@ namespace DotNetNuke.Extensions.Glimpse
         /// </summary>
         /// <param name="context">The context.</param>
         /// <returns>Data to send the the Glimpse client.</returns>
-        public object GetData(HttpContextBase context)
+        public override object GetData(ITabContext context)
         {
             try
             {
@@ -47,8 +45,8 @@ namespace DotNetNuke.Extensions.Glimpse
                     var logProperties = new List<object[]> {new object[] {"Property", "Value"}};
                     for (int j = 0; j < log.LogProperties.Count; j++)
                     {
-                        var logDetail = log.LogProperties[j] as LogDetailInfo;
-                        logProperties.Add(new object[] {logDetail.PropertyName, logDetail.PropertyValue});
+                        var logDetail = (LogDetailInfo)log.LogProperties[j];
+                        logProperties.Add(new object[] { logDetail.PropertyName, logDetail.PropertyValue });
                     }
 
                     data.Add(new object[] {log.LogCreateDate, log.LogTypeKey, log.LogUserName, logProperties});
@@ -58,14 +56,9 @@ namespace DotNetNuke.Extensions.Glimpse
             }
             catch (Exception ex)
             {
-                DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
+                Exceptions.LogException(ex);
                 return null;
             }
         }        
-
-        public void SetupInit()
-        {
-            // nothing to do here right now
-        }
     }
 }

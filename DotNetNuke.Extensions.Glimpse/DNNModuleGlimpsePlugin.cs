@@ -1,20 +1,20 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+
 using DotNetNuke.Entities.Modules;
 using DotNetNuke.Entities.Portals;
+using DotNetNuke.Services.Exceptions;
+
+using Glimpse.AspNet.Extensibility;
 using Glimpse.Core.Extensibility;
-using System;
 
 namespace DotNetNuke.Extensions.Glimpse
 {
-    /// <summary>
-    /// DotNetNuke Glimpse Plugin for DNN modules.
-    /// </summary>
-    [GlimpsePlugin]
-    public class DNNModuleGlimpsePlugin : IGlimpsePlugin
+    /// <summary>DotNetNuke Glimpse Plugin for DNN modules.</summary>
+    public class DNNModuleGlimpsePlugin : AspNetTab
     {
-        public string Name
+        public override string Name
         {
             get { return "DotNetNuke Modules"; }
         }
@@ -24,7 +24,7 @@ namespace DotNetNuke.Extensions.Glimpse
         /// </summary>
         /// <param name="context">The context.</param>
         /// <returns>Data to send the the Glimpse client.</returns>
-        public object GetData(HttpContextBase context)
+        public override object GetData(ITabContext context)
         {
             try
             {
@@ -33,6 +33,7 @@ namespace DotNetNuke.Extensions.Glimpse
                 // if for some reason we don't have a tab ID, bail
                 if (portalSettings.ActiveTab.TabID <= 0)
                     return null;
+
                 // get modules on the page
                 var modules = new ModuleController().GetTabModules(portalSettings.ActiveTab.TabID).Values.ToArray();
 
@@ -40,23 +41,26 @@ namespace DotNetNuke.Extensions.Glimpse
                 var data = new List<object[]> { new object[] { "Module Name", "Module Properties" } };
                 foreach (var module in modules)
                 {
-                    var moduleData = new List<object[]> { new object[] { "Property", "Value" } };
-                    moduleData.Add(new object[] { "Module ID", module.ModuleID });
-                    moduleData.Add(new object[] { "On all Tabs", module.AllTabs });
-                    moduleData.Add(new object[] { "Cache Time", module.CacheTime });
-                    moduleData.Add(new object[] { "Container Path", module.ContainerPath });
-                    moduleData.Add(new object[] { "Container Src", module.ContainerSrc });
-                    moduleData.Add(new object[] { "Header", module.Header });
-                    moduleData.Add(new object[] { "Footer", module.Footer });
-                    moduleData.Add(new object[] { "Inherit View Permissions", module.InheritViewPermissions });
-                    moduleData.Add(new object[] { "Is Premium", module.DesktopModule.IsPremium });
-                    moduleData.Add(new object[] { "Control Key", module.ModuleControl.ControlKey });
-                    moduleData.Add(new object[] { "Control Source", module.ModuleControl.ControlSrc });
-                    moduleData.Add(new object[] { "Permissions", module.DesktopModule.Permissions });
-                    moduleData.Add(new object[] { "Pane", module.PaneName });
-                    moduleData.Add(new object[] { "Start Date", module.StartDate });
-                    moduleData.Add(new object[] { "End Date", module.EndDate });
-                    moduleData.Add(new object[] { "Supports Partial Rendering", module.ModuleControl.SupportsPartialRendering });
+                    var moduleData = new List<object[]>
+                                         {
+                                             new object[] { "Property", "Value" },
+                                             new object[] { "Module ID", module.ModuleID },
+                                             new object[] { "On all Tabs", module.AllTabs },
+                                             new object[] { "Cache Time", module.CacheTime },
+                                             new object[] { "Container Path", module.ContainerPath },
+                                             new object[] { "Container Src", module.ContainerSrc },
+                                             new object[] { "Header", module.Header },
+                                             new object[] { "Footer", module.Footer },
+                                             new object[] { "Inherit View Permissions", module.InheritViewPermissions },
+                                             new object[] { "Is Premium", module.DesktopModule.IsPremium },
+                                             new object[] { "Control Key", module.ModuleControl.ControlKey },
+                                             new object[] { "Control Source", module.ModuleControl.ControlSrc },
+                                             new object[] { "Permissions", module.DesktopModule.Permissions },
+                                             new object[] { "Pane", module.PaneName },
+                                             new object[] { "Start Date", module.StartDate },
+                                             new object[] { "End Date", module.EndDate },
+                                             new object[] { "Supports Partial Rendering", module.ModuleControl.SupportsPartialRendering },
+                                         };
 
                     // get the module settings from the DB
                     var settings = new ModuleController().GetModuleSettings(module.ModuleID);
@@ -75,14 +79,9 @@ namespace DotNetNuke.Extensions.Glimpse
             }
             catch (Exception ex)
             {
-                DotNetNuke.Services.Exceptions.Exceptions.LogException(ex);
+                Exceptions.LogException(ex);
                 return null;
             }
-        }
-       
-        public void SetupInit()
-        {
-            // nothing to do here right now
         }
     }
 }
