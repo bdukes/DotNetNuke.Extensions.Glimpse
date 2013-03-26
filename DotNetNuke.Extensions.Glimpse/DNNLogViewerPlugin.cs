@@ -57,7 +57,7 @@ namespace DotNetNuke.Extensions.Glimpse
             catch (Exception ex)
             {
                 Exceptions.LogException(ex);
-                return null;
+                return "There was an error loading the data for this tab";
             }
         }        
     }
