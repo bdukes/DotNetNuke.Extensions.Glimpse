@@ -10,7 +10,6 @@ using Glimpse.Core.Extensibility;
 
 namespace DotNetNuke.Extensions.Glimpse
 {
-    /// <summary>DotNetNuke Glimpse Plugin</summary>
     public class DNNGlimpsePlugin : AspNetTab
     {
         public override string Name
@@ -18,11 +17,6 @@ namespace DotNetNuke.Extensions.Glimpse
             get { return "DNN"; }
         }
 
-        /// <summary>
-        /// Gets the data to send to the Glimpse client.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <returns>Data to send the the Glimpse client.</returns>
         public override object GetData(ITabContext context)
         {
             try

@@ -11,7 +11,6 @@ using Glimpse.Core.Extensibility;
 
 namespace DotNetNuke.Extensions.Glimpse
 {
-    /// <summary>DotNetNuke Glimpse Plugin for DNN modules.</summary>
     public class DNNModuleGlimpsePlugin : AspNetTab
     {
         public override string Name
@@ -19,25 +18,17 @@ namespace DotNetNuke.Extensions.Glimpse
             get { return "DNN Modules"; }
         }
 
-        /// <summary>
-        /// Gets the data to send to the Glimpse client.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <returns>Data to send the the Glimpse client.</returns>
         public override object GetData(ITabContext context)
         {
             try
             {
                 var portalSettings = PortalSettings.Current;
 
-                // if for some reason we don't have a tab ID, bail
                 if (portalSettings.ActiveTab.TabID <= 0)
                     return null;
 
-                // get modules on the page
                 var modules = new ModuleController().GetTabModules(portalSettings.ActiveTab.TabID).Values.ToArray();
 
-                // add to data to send
                 var data = new List<object[]> { new object[] { "Module Name", "Module Properties" } };
                 foreach (var module in modules)
                 {
@@ -62,16 +53,13 @@ namespace DotNetNuke.Extensions.Glimpse
                                              new object[] { "Supports Partial Rendering", module.ModuleControl.SupportsPartialRendering },
                                          };
 
-                    // get the module settings from the DB
                     var settings = new ModuleController().GetModuleSettings(module.ModuleID);
 
-                    // add to output data
                     var moduleSettings = new List<object[]> { new object[] { "Setting", "Value" } };
                     foreach (var settingKey in settings.Keys)
                         moduleSettings.Add(new object[] { settingKey.ToString(), settings[settingKey].ToString() });
                     moduleData.Add(new object[] { "Settings", moduleSettings });
 
-                    // add to main data
                     data.Add(new object[] { (module.ModuleTitle ?? module.DesktopModule.FriendlyName), moduleData });
                 }
 
