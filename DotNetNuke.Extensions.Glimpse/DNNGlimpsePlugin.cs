@@ -21,31 +21,48 @@ namespace DotNetNuke.Extensions.Glimpse
         {
             try
             {
+                var hostSettings = HostController.Instance.GetSettingsDictionary();
                 var portalSettings = PortalSettings.Current;
                 var portalAliases = from PortalAliasInfo pa in new PortalAliasController().GetPortalAliasArrayByPortalID(portalSettings.PortalId)
                                     select pa.HTTPAlias;
-                var httpContext = context.GetRequestContext<HttpContextBase>();
-                var contextItems = from string key in httpContext.Items.Keys
-                                   let value = httpContext.Items[key]
-                                   where !key.StartsWith("__Glimpse")
-                                   orderby key
-                                   select new { key, value = value == null ? null : value is IDictionary<string, string> ? value : value.ToString() };
-                return new {
-                    Portal = new {
+
+                return new
+                {
+                    Host = new
+                    {
+                        AutoAddPortalAlias = hostSettings["AutoAddPortalAlias"],
+                        ControlPane = hostSettings["ControlPanel"],
+                        Extensions = hostSettings["FileExtensions"],
+                        Caching = hostSettings["ModuleCaching"],
+                        HostEmail = hostSettings["HostEmail"],
+                        Title = hostSettings["HostTitle"],
+                        UseFriendlyURLs = hostSettings["UseFriendlyUrls"],
+                        SMTP = new { 
+                            Server = hostSettings["SMTPServer"],
+                            UserName = hostSettings["SMTPUsername"],
+                            SSL = hostSettings["SMTPEnableSSL"],
+                            Auth = hostSettings["SMTPAuthentication"]
+                        }
+                    },
+                    Portal = new
+                    {
                         ID = portalSettings.PortalId,
                         Name = portalSettings.PortalName,
                         Aliases = portalAliases.ToArray(),
-                        SSL = new { 
+                        SSL = new
+                        {
                             Enabled = portalSettings.SSLEnabled,
                             Enforced = portalSettings.SSLEnforced,
                         },
                     },
-                    User = new {
+                    User = new
+                    {
                         ID = portalSettings.UserId,
                         Username = portalSettings.UserInfo.Username,
                         Roles = portalSettings.UserInfo.Roles,
                     },
-                    Tab = new {
+                    Tab = new
+                    {
                         ID = portalSettings.ActiveTab.TabID,
                         Name = portalSettings.ActiveTab.TabName,
                         Title = portalSettings.ActiveTab.Title,
@@ -53,8 +70,7 @@ namespace DotNetNuke.Extensions.Glimpse
                         Secure = portalSettings.ActiveTab.IsSecure,
                         SkinPath = portalSettings.ActiveTab.SkinPath,
                         SkinSource = portalSettings.ActiveTab.SkinSrc,
-                    },
-                    Context = contextItems.ToArray(),
+                    }
                 };
             }
             catch (Exception ex)
