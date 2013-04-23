@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 
 using DotNetNuke.Entities.Modules;
@@ -22,48 +21,33 @@ namespace DotNetNuke.Extensions.Glimpse
         {
             try
             {
-                var portalSettings = PortalSettings.Current;
-
-                if (portalSettings.ActiveTab.TabID <= 0)
-                    return null;
-
-                var modules = new ModuleController().GetTabModules(portalSettings.ActiveTab.TabID).Values.ToArray();
-
-                var data = new List<object[]> { new object[] { "Module Name", "Module Properties" } };
-                foreach (var module in modules)
+                if (PortalSettings.Current.ActiveTab.TabID <= 0)
                 {
-                    var moduleData = new List<object[]>
-                                         {
-                                             new object[] { "Property", "Value" },
-                                             new object[] { "Module ID", module.ModuleID },
-                                             new object[] { "On all Tabs", module.AllTabs },
-                                             new object[] { "Cache Time", module.CacheTime },
-                                             new object[] { "Container Path", module.ContainerPath },
-                                             new object[] { "Container Src", module.ContainerSrc },
-                                             new object[] { "Header", module.Header },
-                                             new object[] { "Footer", module.Footer },
-                                             new object[] { "Inherit View Permissions", module.InheritViewPermissions },
-                                             new object[] { "Is Premium", module.DesktopModule.IsPremium },
-                                             new object[] { "Control Key", module.ModuleControl.ControlKey },
-                                             new object[] { "Control Source", module.ModuleControl.ControlSrc },
-                                             new object[] { "Permissions", module.DesktopModule.Permissions },
-                                             new object[] { "Pane", module.PaneName },
-                                             new object[] { "Start Date", module.StartDate },
-                                             new object[] { "End Date", module.EndDate },
-                                             new object[] { "Supports Partial Rendering", module.ModuleControl.SupportsPartialRendering },
-                                         };
-
-                    var settings = new ModuleController().GetModuleSettings(module.ModuleID);
-
-                    var moduleSettings = new List<object[]> { new object[] { "Setting", "Value" } };
-                    foreach (var settingKey in settings.Keys)
-                        moduleSettings.Add(new object[] { settingKey.ToString(), settings[settingKey].ToString() });
-                    moduleData.Add(new object[] { "Settings", moduleSettings });
-
-                    data.Add(new object[] { (module.ModuleTitle ?? module.DesktopModule.FriendlyName), moduleData });
+                    return null;
                 }
 
-                return data;
+                return from module in new ModuleController().GetTabModules(PortalSettings.Current.ActiveTab.TabID).Values
+                       select new
+                                  {
+                                      Title = module.ModuleTitle ?? module.DesktopModule.FriendlyName,
+                                      module.ModuleID,
+                                      module.AllTabs,
+                                      module.CacheTime,
+                                      module.ContainerPath,
+                                      module.ContainerSrc,
+                                      module.Header,
+                                      module.Footer,
+                                      module.InheritViewPermissions,
+                                      module.DesktopModule.IsPremium,
+                                      module.ModuleControl.ControlKey,
+                                      module.ModuleControl.ControlSrc,
+                                      module.DesktopModule.Permissions, // TODO: is this a reasonable value to show?
+                                      module.PaneName,
+                                      module.StartDate,
+                                      module.EndDate,
+                                      module.ModuleControl.SupportsPartialRendering,
+                                      module.ModuleSettings,
+                                  };
             }
             catch (Exception ex)
             {

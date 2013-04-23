@@ -8,6 +8,8 @@ using Glimpse.Core.Extensibility;
 
 namespace DotNetNuke.Extensions.Glimpse
 {
+    using System.Linq;
+
     public class DNNLogViewerPlugin : AspNetTab
     {
         public override string Name
@@ -19,30 +21,15 @@ namespace DotNetNuke.Extensions.Glimpse
         {
             try
             {
-                var portalSettings = PortalSettings.Current;
-
-                int totalRecords = 0;
-                LogInfoArray logs = new LogController().GetLog(portalSettings.PortalId, 15, 1, ref totalRecords);
-
-                if (logs.Count == 0)
-                    return null;
-
-                var data = new List<object[]> {new object[] {"Created Date", "Log Type", "UserName", "Content"}};
-                for (int i = 0; i < logs.Count; i++)
-                {
-                    var log = logs.GetItem(i);
-
-                    var logProperties = new List<object[]> {new object[] {"Property", "Value"}};
-                    for (int j = 0; j < log.LogProperties.Count; j++)
-                    {
-                        var logDetail = (LogDetailInfo)log.LogProperties[j];
-                        logProperties.Add(new object[] { logDetail.PropertyName, logDetail.PropertyValue });
-                    }
-
-                    data.Add(new object[] {log.LogCreateDate, log.LogTypeKey, log.LogUserName, logProperties});
-                }
-
-                return data;
+                var totalRecords = 0;
+                return from LogInfo log in new LogController().GetLog(PortalSettings.Current.PortalId, 15, 1, ref totalRecords)
+                       select new
+                                  {
+                                      CreatedDate = log.LogCreateDate,
+                                      LogType = log.LogTypeKey,
+                                      Username = log.LogUserName,
+                                      Content = log.LogProperties.Cast<LogDetailInfo>().ToDictionary(p => p.PropertyName, p => p.PropertyValue),
+                                  };
             }
             catch (Exception ex)
             {

@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+
+using DotNetNuke.Entities.Controllers;
 using DotNetNuke.Entities.Portals;
-using DotNetNuke.Entities.Users;
 using DotNetNuke.Services.Exceptions;
 using Glimpse.AspNet.Extensibility;
 using Glimpse.Core.Extensibility;
 
 namespace DotNetNuke.Extensions.Glimpse
 {
+    using DotNetNuke.Entities.Host;
+
     public class DNNGlimpsePlugin : AspNetTab
     {
         public override string Name
@@ -31,17 +32,17 @@ namespace DotNetNuke.Extensions.Glimpse
                     Host = new
                     {
                         AutoAddPortalAlias = hostSettings["AutoAddPortalAlias"],
-                        ControlPane = hostSettings["ControlPanel"],
-                        Extensions = hostSettings["FileExtensions"],
-                        Caching = hostSettings["ModuleCaching"],
-                        HostEmail = hostSettings["HostEmail"],
-                        Title = hostSettings["HostTitle"],
-                        UseFriendlyURLs = hostSettings["UseFriendlyUrls"],
+                        Host.ControlPanel,
+                        Host.FileExtensions,
+                        Host.ModuleCachingMethod,
+                        Host.HostEmail,
+                        Host.HostTitle,
+                        Host.UseFriendlyUrls,
                         SMTP = new { 
-                            Server = hostSettings["SMTPServer"],
-                            UserName = hostSettings["SMTPUsername"],
-                            SSL = hostSettings["SMTPEnableSSL"],
-                            Auth = hostSettings["SMTPAuthentication"]
+                            Server = Host.SMTPServer,
+                            UserName = Host.SMTPUsername,
+                            SSL = Host.EnableSMTPSSL,
+                            Auth = Host.SMTPAuthentication,
                         }
                     },
                     Portal = new
@@ -58,19 +59,19 @@ namespace DotNetNuke.Extensions.Glimpse
                     User = new
                     {
                         ID = portalSettings.UserId,
-                        Username = portalSettings.UserInfo.Username,
-                        Roles = portalSettings.UserInfo.Roles,
+                        portalSettings.UserInfo.Username,
+                        portalSettings.UserInfo.Roles,
                     },
                     Tab = new
                     {
                         ID = portalSettings.ActiveTab.TabID,
                         Name = portalSettings.ActiveTab.TabName,
-                        Title = portalSettings.ActiveTab.Title,
+                        portalSettings.ActiveTab.Title,
                         Path = portalSettings.ActiveTab.TabPath,
                         Secure = portalSettings.ActiveTab.IsSecure,
-                        SkinPath = portalSettings.ActiveTab.SkinPath,
+                        portalSettings.ActiveTab.SkinPath,
                         SkinSource = portalSettings.ActiveTab.SkinSrc,
-                    }
+                    },
                 };
             }
             catch (Exception ex)
