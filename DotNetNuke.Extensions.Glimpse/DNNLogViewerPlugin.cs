@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using DotNetNuke.Entities.Portals;
-using DotNetNuke.Services.Exceptions;
-using DotNetNuke.Services.Log.EventLog;
-using Glimpse.AspNet.Extensibility;
-using Glimpse.Core.Extensibility;
-
+﻿
 namespace DotNetNuke.Extensions.Glimpse
 {
+    using System;
     using System.Linq;
+
+    using DotNetNuke.Entities.Portals;
+    using DotNetNuke.Services.Exceptions;
+    using DotNetNuke.Services.Log.EventLog;
+
+    using global::Glimpse.AspNet.Extensibility;
+    using global::Glimpse.Core.Extensibility;
 
     public class DNNLogViewerPlugin : AspNetTab
     {

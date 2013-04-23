@@ -1,17 +1,17 @@
-﻿using System;
-using System.Linq;
-
-using DotNetNuke.Common.Utilities;
-using DotNetNuke.Entities.Modules;
-using DotNetNuke.Entities.Portals;
-using DotNetNuke.Security.Permissions;
-using DotNetNuke.Services.Exceptions;
-
-using Glimpse.AspNet.Extensibility;
-using Glimpse.Core.Extensibility;
-
-namespace DotNetNuke.Extensions.Glimpse
+﻿namespace DotNetNuke.Extensions.Glimpse
 {
+    using System;
+    using System.Linq;
+
+    using DotNetNuke.Common.Utilities;
+    using DotNetNuke.Entities.Modules;
+    using DotNetNuke.Entities.Portals;
+    using DotNetNuke.Security.Permissions;
+    using DotNetNuke.Services.Exceptions;
+
+    using global::Glimpse.AspNet.Extensibility;
+    using global::Glimpse.Core.Extensibility;
+
     public class DNNModuleGlimpsePlugin : AspNetTab
     {
         public override string Name
