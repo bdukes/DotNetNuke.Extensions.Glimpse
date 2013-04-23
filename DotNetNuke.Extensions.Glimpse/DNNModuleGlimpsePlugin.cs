@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Linq;
 
+using DotNetNuke.Common.Utilities;
 using DotNetNuke.Entities.Modules;
 using DotNetNuke.Entities.Portals;
+using DotNetNuke.Security.Permissions;
 using DotNetNuke.Services.Exceptions;
 
 using Glimpse.AspNet.Extensibility;
@@ -33,18 +35,24 @@ namespace DotNetNuke.Extensions.Glimpse
                                       module.ModuleID,
                                       module.AllTabs,
                                       module.CacheTime,
-                                      module.ContainerPath,
                                       module.ContainerSrc,
                                       module.Header,
                                       module.Footer,
                                       module.InheritViewPermissions,
+                                      Permissions = from ModulePermissionInfo p in module.ModulePermissions
+                                                    select new
+                                                               {
+                                                                   p.AllowAccess,
+                                                                   p.PermissionName,
+                                                                   p.RoleName,
+                                                                   p.Username,
+                                                               },
                                       module.DesktopModule.IsPremium,
                                       module.ModuleControl.ControlKey,
                                       module.ModuleControl.ControlSrc,
-                                      module.DesktopModule.Permissions, // TODO: is this a reasonable value to show?
                                       module.PaneName,
-                                      module.StartDate,
-                                      module.EndDate,
+                                      StartDate = Null.IsNull(module.StartDate) ? (DateTime?)null : module.StartDate,
+                                      EndDate = Null.IsNull(module.EndDate) ? (DateTime?)null : module.EndDate,
                                       module.ModuleControl.SupportsPartialRendering,
                                       module.ModuleSettings,
                                   };

@@ -69,7 +69,6 @@ namespace DotNetNuke.Extensions.Glimpse
                         portalSettings.ActiveTab.Title,
                         Path = portalSettings.ActiveTab.TabPath,
                         Secure = portalSettings.ActiveTab.IsSecure,
-                        portalSettings.ActiveTab.SkinPath,
                         SkinSource = portalSettings.ActiveTab.SkinSrc,
                     },
                 };
