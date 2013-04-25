@@ -33,7 +33,7 @@ namespace DotNetNuke.Extensions.Glimpse
             try
             {
                 var totalRecords = 0;
-                return from LogInfo log in new LogController().GetLog(PortalSettings.Current.PortalId, 15, 1, ref totalRecords)
+                return from LogInfo log in new LogController().GetLog(PortalSettings.Current.PortalId, 15, 0, ref totalRecords)
                        select new
                                   {
                                       CreatedDate = log.LogCreateDate,
