@@ -7,6 +7,7 @@ using DotNetNuke.Entities.Users;
 using DotNetNuke.Services.Exceptions;
 using Glimpse.AspNet.Extensibility;
 using Glimpse.Core.Extensibility;
+using DotNetNuke.Entities.Controllers;
 
 namespace DotNetNuke.Extensions.Glimpse
 {

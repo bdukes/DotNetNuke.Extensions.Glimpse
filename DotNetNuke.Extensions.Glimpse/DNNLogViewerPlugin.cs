@@ -22,7 +22,7 @@ namespace DotNetNuke.Extensions.Glimpse
                 var portalSettings = PortalSettings.Current;
 
                 int totalRecords = 0;
-                LogInfoArray logs = new LogController().GetLog(portalSettings.PortalId, 15, 1, ref totalRecords);
+                LogInfoArray logs = new LogController().GetLog(portalSettings.PortalId, 15, 0, ref totalRecords);
 
                 if (logs.Count == 0)
                     return null;
